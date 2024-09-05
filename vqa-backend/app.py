@@ -1,49 +1,52 @@
 from flask import Flask, request, jsonify
-import uuid
+from werkzeug.utils import secure_filename
+import os
+from utils.image_processing import preprocess_image
+from utils.question_processing import preprocess_question
+from utils.model_inference import get_answer
+from database import init_db, save_interaction
 
 app = Flask(__name__)
-sessions = {}
+app.config['UPLOAD_FOLDER'] = './uploads'
 
-@app.route('/api/process', methods=['POST'])
-def process():
-    if 'image' not in request.files or 'question' not in request.form:
-        return jsonify({'error': 'Image and question are required'}), 400
-    
-    image = request.files['image']
-    question = request.form['question']
+# Initialize database connection
+init_db()
 
-    # Generate a session ID
-    session_id = str(uuid.uuid4())
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        processed_image = preprocess_image(filepath)
+        return jsonify({'message': 'Image uploaded and processed successfully', 'image_path': filepath}), 200
 
-    # Save session data
-    sessions[session_id] = {
-        'image': image.read(),  
-        'question': question,
-        'chat_history': []
-    }
-
-    return jsonify({
-        'message': 'Image and question received successfully',
-        'session_id': session_id
-    })
-
-@app.route('/api/resume', methods=['POST'])
-def resume():
+@app.route('/ask_question', methods=['POST'])
+def ask_question():
     data = request.json
-    session_id = data.get('session_id')
-
-    if session_id not in sessions:
-        return jsonify({'error': 'Session ID not found'}), 404
-
-    # Retrieve session data
-    session_data = sessions[session_id]
-
-    return jsonify({
-        'success': True,
-        'image': session_data['image'],
-        'question': session_data['question'],
-        'chat_history': session_data['chat_history'] 
-    })
+    if 'image_path' not in data or 'question' not in data:
+        return jsonify({'error': 'Invalid input'}), 400
+    
+    image_path = data['image_path']
+    question = data['question']
+    
+    processed_image = preprocess_image(image_path)
+    processed_question = preprocess_question(question)
+    
+    # Get the answer from the ML model
+    answer = get_answer(processed_image, processed_question)
+    
+    # Save interaction in the database
+    save_interaction(image_path, question, answer)
+    
+    return jsonify({'question': question, 'answer': answer}), 200
 
 if __name__ == '__main__':
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(debug=True)
