@@ -1,4 +1,4 @@
-from app.models.vqa_model import get_model, get_tokenizer
+from backend.app.models.vqa_model import get_model, get_tokenizer
 from PIL import Image
 import numpy as np
 import os
