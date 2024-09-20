@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.app.services.vqa_service import process_vqa
+from backend.app.services.vqa_service import predict_vqa
 
 vqa_routes = Blueprint('vqa', __name__)
 
@@ -9,6 +9,6 @@ def vqa():
     question = request.form.get('question')
 
     # Call the VQA service to get predictions
-    answer = process_vqa(image, question)
+    answer = predict_vqa(image, question)
 
     return jsonify({'answer': answer})
