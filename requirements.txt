@@ -1,5 +1,5 @@
 flask
-tensorflow
+tensorflow==2.17.0
 transformers
 Pillow
 numpy
