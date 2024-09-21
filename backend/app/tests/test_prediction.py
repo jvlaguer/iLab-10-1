@@ -1,8 +1,7 @@
-# Example usage
 import requests
 
 # Define the API endpoint
-url = "http://localhost:5000/vqa"
+url = "http://127.0.0.1:5000/vqa"
 
 # Prepare the image file and the question
 image_path = './backend/app/tests/image.jpg'
@@ -12,8 +11,15 @@ question = "are the lungs normal appearing?"
 files = {'image': open(image_path, 'rb')}
 data = {'question': question}
 
-# Send the POST request with the image and question
-response = requests.post(url, files=files, data=data)
+# Optionally, add headers
+headers = {
+    'User-Agent': 'MyTestScript/1.0',
+}
 
-# Print the response from the server
-print(response.json())
+# Send the POST request with the image and question
+response = requests.post(url, files=files, data=data, headers=headers)
+
+if response.status_code == 200:
+    print(response.json())
+else:
+    print("Error:", response.text)
