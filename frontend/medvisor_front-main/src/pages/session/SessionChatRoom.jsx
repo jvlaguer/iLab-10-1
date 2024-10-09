@@ -2,14 +2,16 @@ import styles from "./SessionChatRoom.module.css";
 import { useEffect, useState } from "react";
 import { ChatBubble } from "../../components/non-ui/ChatBubble";
 import { MobileDrawer } from "../../components/ui/MobileDrawer";
+import { Delayed } from "../../components/non-ui/Delayed";
 import { SCRSidebar } from "./SessionChatRoom-Sidebar";
 import { Link } from "wouter";
 import { Paperclip, Send, ArrowLeft } from "lucide-react";
 import exampleXray from "../../assets/example-xray.webp";
+import { useMutation } from "@tanstack/react-query";
 
 export default function SessionChatRoom({ params }) {
   const { sessionId } = params;
-  const [previewImg, setPreviewImg] = useState(exampleXray); // "https://placehold.co/600x400"
+  const [previewImg, setPreviewImg] = useState("https://placehold.co/600x400"); // "https://placehold.co/600x400"
   const [chatMsgs, setChatMsgs] = useState([]);
 
   const handleFiles = (e) => {
@@ -18,12 +20,43 @@ export default function SessionChatRoom({ params }) {
     setPreviewImg(URL.createObjectURL(currentImage));
   };
 
+  const sendFormData = useMutation({
+    mutationFn: (formData) =>
+      fetch("http://127.0.0.1:5000/vqa", {
+        mode: "cors",
+        method: "POST",
+        body: formData,
+        // headers: corsHeader,
+      }).then((res) => res.json()),
+
+    onMutate: (variables) => {
+      setChatMsgs((prev) => [...prev, { message: variables.get("question") }]);
+    },
+
+    onError: (error, variables, context) => {
+      console.error(error);
+      setChatMsgs((prev) => prev.slice(0, -1));
+    },
+
+    onSuccess: (data, variables, context) => {
+      setChatMsgs((prev) => [
+        ...prev,
+        {
+          message: data.answer,
+          type: "answer",
+          img: URL.createObjectURL(variables.get("image")),
+        },
+      ]);
+    },
+  });
+
   const sendNewQuestion = (e) => {
     e.preventDefault();
-    const newMsg = e.target.msgInput.value;
-    e.target.msgInput.value = "";
 
-    setChatMsgs((prev) => [...prev, { message: newMsg }]);
+    const formData = new FormData(e.target);
+    sendFormData.mutate(formData);
+
+    e.target.question.value = "";
   };
 
   useEffect(() => {
@@ -39,6 +72,10 @@ export default function SessionChatRoom({ params }) {
         img: exampleXray, //"https://placehold.co/30x30"
       },
     ]);
+
+    // get last used image if it exists then replace the preview img
+    // for now it's just exampleXray
+    setPreviewImg(exampleXray);
   }, []);
 
   return (
@@ -68,24 +105,35 @@ export default function SessionChatRoom({ params }) {
             {chatMsgs.map((props, index) => (
               <ChatBubble key={index} {...props} />
             ))}
+            {sendFormData.isPending && (
+              <Delayed>
+                <ChatBubble
+                  message="Loading..."
+                  type="answer"
+                  img={URL.createObjectURL(sendFormData.variables.get("image"))}
+                />
+              </Delayed>
+            )}
           </div>
           <form id={`${styles.askingForm}`} onSubmit={sendNewQuestion}>
             <div style={{ position: "relative" }}>
-              <label htmlFor="imgInput">
+              <label htmlFor="image">
                 <Paperclip />
               </label>
               <input
                 type="file"
-                name="imgInput"
-                id="imgInput"
+                name="image"
+                id="image"
+                accept="image/*"
                 onChange={handleFiles}
                 className={`${styles.imgInput}`}
+                required
               />
             </div>
             <input
               type="text"
-              name="msgInput"
-              id="msgInput"
+              name="question"
+              id="question"
               placeholder="Enter your question"
               className={`${styles.msgInput}`}
               required

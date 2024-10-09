@@ -4,6 +4,10 @@ This repository contains the files for the frontend code for MedVisor.
 
 ---
 
+## Prerequisites:
+
+- Node Version 20.15.1
+
 ## Running Locally:
 
 To run this project locally, install the needed node modules by entering the
