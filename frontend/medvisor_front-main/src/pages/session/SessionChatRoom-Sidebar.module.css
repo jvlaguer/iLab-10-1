@@ -1,0 +1,30 @@
+.sidebar {
+  width: 400px;
+  background-color: var(--gray-bg-color);
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebarContent {
+  flex-grow: 1;
+}
+
+.imgPreview {
+  border-radius: 1rem;
+  object-fit: cover;
+  /* change aspect ratio to fit with file reqs */
+  aspect-ratio: 6/4;
+}
+
+@media screen and (max-width: 750px) {
+  .sidebar {
+    display: none;
+  }
+
+  .pageContainer {
+    padding-top: 3dvh;
+  }
+}
