@@ -17,6 +17,6 @@ def vqa():
     question = request.form.get('question')
 
     # Call the VQA service to get predictions
-    answer = predict_vqa(image, question)
+    answer = predict_vqa(question, image)
 
     return jsonify({'answer': answer})
