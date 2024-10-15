@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from backend.app.routes.vqa_routes import vqa_routes
+from app.routes.vqa_routes import vqa_routes
 
 def create_app():
     app = Flask(__name__)
