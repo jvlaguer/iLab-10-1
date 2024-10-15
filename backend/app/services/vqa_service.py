@@ -1,9 +1,9 @@
 # Services to manage image & questions preprocessing
-from backend.app.models.vqa_model import VQAModel
+from app.models.vqa_model import VQAModel
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from backend.app.config import Config
+from app.config import Config
 
 # Get the Model url from Dropbox
 dropbox_url = Config.DROPBOX_URL
@@ -51,8 +51,9 @@ def predict_vqa(question, image_file=None):
     # Process the input (image + question)
     features = process_image_text(image, question)
 
-    # Generate answer using the model
-    answer = model.predict(features)
-
-    # Get the predicted answer
-    return answer
+        # Make predictions using the model
+    predictions = model.predict(features)
+    
+    # Get the predicted answer (yes/no binary classification)
+    predicted_class = np.argmax(predictions, axis=1)
+    return 'yes' if predicted_class == 1 else 'no'
