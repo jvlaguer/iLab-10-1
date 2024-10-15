@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.app.services.vqa_service import predict_vqa
+from app.services.vqa_service import predict_vqa
 import logging
 
 # Set up logging
@@ -17,6 +17,6 @@ def vqa():
     question = request.form.get('question')
 
     # Call the VQA service to get predictions
-    answer = predict_vqa(image, question)
+    answer = predict_vqa(question, image)
 
     return jsonify({'answer': answer})
