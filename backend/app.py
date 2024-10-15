@@ -1,9 +1,11 @@
 import os
 from flask import Flask
 from app.routes.vqa_routes import vqa_routes
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     
     # Register the blueprint
     app.register_blueprint(vqa_routes)
