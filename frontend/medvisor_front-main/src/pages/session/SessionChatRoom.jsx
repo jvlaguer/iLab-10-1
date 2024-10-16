@@ -8,11 +8,13 @@ import { Link } from "wouter";
 import { Paperclip, Send, ArrowLeft } from "lucide-react";
 import exampleXray from "../../assets/example-xray.webp";
 import { useMutation } from "@tanstack/react-query";
+import { useModelDataStore } from "../../utils/modelDataStore";
 
 export default function SessionChatRoom({ params }) {
   const { sessionId } = params;
   const [previewImg, setPreviewImg] = useState("https://placehold.co/600x400"); // "https://placehold.co/600x400"
   const [chatMsgs, setChatMsgs] = useState([]);
+  const { dataForm, setDataForm, resetDataForm } = useModelDataStore();
 
   const handleFiles = (e) => {
     const currentImage = e.target.files[0];
@@ -61,21 +63,12 @@ export default function SessionChatRoom({ params }) {
 
   useEffect(() => {
     // insert fetching from db here
-    // blah blah blah
+    if (!dataForm) {
+      return;
+    }
+    sendFormData.mutate(dataForm);
 
-    // insert data from db into chat msgs
-    setChatMsgs([
-      { message: "what abnormality is seen?", type: "question" },
-      {
-        message: "blind-ending loop of bowel arising from the cecum",
-        type: "answer",
-        img: exampleXray, //"https://placehold.co/30x30"
-      },
-    ]);
-
-    // get last used image if it exists then replace the preview img
-    // for now it's just exampleXray
-    setPreviewImg(exampleXray);
+    return () => resetDataForm();
   }, []);
 
   return (

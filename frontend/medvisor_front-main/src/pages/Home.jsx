@@ -1,10 +1,22 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useModelDataStore } from "../utils/modelDataStore";
 import style from "./Home.module.css";
 
 function Home() {
   const [existingSessionId, setExistingSessionId] = useState("");
   const [location, setLocation] = useLocation();
+  const { setDataForm } = useModelDataStore();
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    const data = new FormData(e.target);
+    setDataForm(data);
+    console.log("added FormData to zustand store");
+
+    setLocation("/session/newChat");
+  };
 
   return (
     <main className={style.page}>
@@ -17,26 +29,26 @@ function Home() {
           </p>
         </div>
 
-        <form action="/">
+        <form onSubmit={onSubmit}>
           <input
             type="file"
             accept="image/*"
-            name="model-image"
-            id="model-image"
+            name="image"
+            id="image"
             className={style.modelImage}
             required
           />
           <div>
             <textarea
-              name="model-question"
-              id="model-question"
+              name="question"
+              id="question"
               cols="65"
               placeholder="Enter your question"
               wrap="soft"
               maxLength={300}
               required
             />
-            <label htmlFor="model-question">Max 300 Characters</label>
+            <label htmlFor="question">Max 300 Characters</label>
           </div>
           <button type="submit">SUBMIT</button>
         </form>
