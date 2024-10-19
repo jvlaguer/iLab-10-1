@@ -4,6 +4,22 @@
 
 This contains zip file contaning RoBERTa and BLIP. Due to low accuracy of LLAMA in genartaing captions, it's being only used for verfying if image is Radiology or not. Link: https://drive.google.com/file/d/1urZJKEJ3NrxUobV7ExvUVokt3j8pem58/view?usp=share_link
 
+Folder Structer should be like:<br>
+
+<b>VQA</b><br>
+|- models (folder)<br>
+||- blip_finetuned_model<br>
+||- model_roco.keras<br>
+||- vqa_model_roberta_finetuned.keras<br>
+|- features (folder)<br>
+||- features_roco.pkl <br>
+|- BLIP.ipynb <br>
+|- Integration.ipynb <br>
+|- llama.ipynb <br>
+|- RoBERTa.ipynb <br>
+|- image.jpg <br>
+
+
 
 
 ## Project Description
