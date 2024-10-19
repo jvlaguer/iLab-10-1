@@ -1,15 +1,11 @@
 # Services to manage image & questions preprocessing
-from app.models.vqa_model import VQAModel
+from backend.app.models.vqa_model import VQAModel
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from app.config import Config
-
-# Get the Model url from Dropbox
-dropbox_url = Config.DROPBOX_URL
 
 # Initialize VQAModel and get necessary models
-vqa_model = VQAModel(dropbox_url=dropbox_url)
+vqa_model = VQAModel()
 model = vqa_model.get_model()
 resnet_model = vqa_model.get_resnet()
 tokenizer = vqa_model.get_tokenizer()

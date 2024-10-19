@@ -27,7 +27,7 @@ FILE_KEY = "vqa_model_roberta_finetuned.keras"
 
 # Define the VQAModel class with Keras model
 class VQAModel:
-    def __init__(self, dropbox_url):
+    def __init__(self):
         # Set the path for the model file inside the models directory
         model_path = os.path.join(
             os.path.dirname(__file__), "vqa_model_roberta_finetuned.keras"

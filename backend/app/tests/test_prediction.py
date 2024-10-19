@@ -1,7 +1,7 @@
 import requests
 
 # Define the API endpoint
-url = "http://127.0.0.1:5000/vqa"
+url = "http://localhost:5000/vqa"
 
 # Prepare the image file and the question
 image_path = './backend/app/tests/image.jpg'
