@@ -2,6 +2,7 @@
 from backend.app.models.vqa_model import VQAModel
 import numpy as np
 import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')
 from PIL import Image
 
 # Initialize VQAModel and get necessary models
