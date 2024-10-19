@@ -1,5 +1,5 @@
 from flask import Flask
-from app.routes import vqa_routes
+from backend.app.routes.vqa_routes import vqa_routes
 
 
 def create_app():
@@ -9,3 +9,6 @@ def create_app():
     app.register_blueprint(vqa_routes)
 
     return app
+
+# The application object
+app = create_app()
