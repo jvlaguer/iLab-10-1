@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.vqa_service import predict_vqa
+from backend.app.services.vqa_service import predict_vqa
 
 vqa_routes = Blueprint("vqa", __name__)
 

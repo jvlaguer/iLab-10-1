@@ -1,5 +1,5 @@
 # Services to manage image & questions preprocessing
-from app.models.vqa_model import VQAModel
+from backend.app.models.vqa_model import VQAModel
 import numpy as np
 import tensorflow as tf
 from PIL import Image
