@@ -1,0 +1,21 @@
+.image-upload {
+    margin: 20px auto;
+    max-width: 600px;
+  }
+  
+  .image-upload input[type="file"] {
+    margin-bottom: 10px;
+  }
+  
+  .image-upload textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .image-preview img {
+    max-width: 100%;
+    height: auto;
+  }
+  
