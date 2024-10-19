@@ -1,6 +1,10 @@
 # Visual Question Answering (VQA) System for Medical Images
 
-## Link
+## Project Description
+
+Visual Question Answering (VQA) for medical images is an advanced task in the field of medical imaging and artificial intelligence. This project aims to bridge the gap between image recognition and medical knowledge, enabling machines to comprehend and interpret the content of medical images (such as X-rays, MRIs, and CT scans) and subsequently answer questions posed in natural language based on that content. The goal is to develop a VQA system specifically designed for medical images to aid healthcare professionals in medical diagnosis and patient care.
+
+## Link & Folder Sturcture
 
 This contains zip file contaning RoBERTa and BLIP. Due to low accuracy of LLAMA in genartaing captions, it's being only used for verfying if image is Radiology or not. Link: https://drive.google.com/file/d/1urZJKEJ3NrxUobV7ExvUVokt3j8pem58/view?usp=share_link
 
@@ -20,11 +24,6 @@ Folder Structer should be like:<br>
 |- image.jpg <br>
 
 
-
-
-## Project Description
-
-Visual Question Answering (VQA) for medical images is an advanced task in the field of medical imaging and artificial intelligence. This project aims to bridge the gap between image recognition and medical knowledge, enabling machines to comprehend and interpret the content of medical images (such as X-rays, MRIs, and CT scans) and subsequently answer questions posed in natural language based on that content. The goal is to develop a VQA system specifically designed for medical images to aid healthcare professionals in medical diagnosis and patient care.
 
 ## Team Members
 
