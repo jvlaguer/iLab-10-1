@@ -172,3 +172,4 @@ cython_debug/
 #.idea/
 *env/
 *.keras
+package-lock.json
