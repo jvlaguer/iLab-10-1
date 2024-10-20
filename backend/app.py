@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, origins="http://localhost:5173", supports_credentials=True)
 
     # Set up logging configuration
     logging.basicConfig(
