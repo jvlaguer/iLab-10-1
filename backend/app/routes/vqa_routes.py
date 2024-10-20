@@ -15,7 +15,6 @@ def vqa():
     if request.method == "OPTIONS":
         # This handles the preflight request by sending the correct CORS headers.
         return jsonify({"message": "CORS preflight accepted"}), 200
-    
     image = request.files.get("image")
     question = request.form.get("question")
 
