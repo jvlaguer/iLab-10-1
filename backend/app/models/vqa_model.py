@@ -2,6 +2,9 @@ import os
 import boto3
 from dotenv import load_dotenv
 from transformers import BlipProcessor, BlipForQuestionAnswering
+import torch
+import torch.nn as nn
+from torchvision import models
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -23,11 +26,13 @@ BUCKET_NAME = "roberta-finetuned"
 FOLDER_KEY = "blip_finetuned_model/"  # S3 folder path
 
 
-# Define the VQAModel class with Keras model
+# Define the VQAModel class
 class VQAModel:
     def __init__(self):
         # Set the path for the model folder inside the models directory
-        self.model_path = os.path.join(os.path.dirname(__file__), "blip_finetuned_model")
+        self.model_path = os.path.join(
+            os.path.dirname(__file__), "blip_finetuned_model"
+        )
 
         # Check if the model folder already exists
         if not os.path.exists(self.model_path):
@@ -37,11 +42,30 @@ class VQAModel:
         self.model = BlipForQuestionAnswering.from_pretrained(self.model_path)
         self.processor = BlipProcessor.from_pretrained(self.model_path)
 
+        # Load the radiology classifier model
+        self.rad_classifier = self.load_radiology_classifier()
+
+    def load_radiology_classifier(self):
+        # Initialize the ResNet18 model for binary classification
+        model = models.resnet18(pretrained=False)
+        num_features = model.fc.in_features
+        model.fc = nn.Linear(num_features, 1)  # Binary classification (1 output)
+
+        # Load the trained weights
+        rad_path = os.path.join(os.path.dirname(__file__), "radiology_classifier.pth")
+        model.load_state_dict(torch.load(rad_path, map_location=torch.device("cpu")))
+
+        model.eval()  # Set the model to evaluation mode
+        return model
+
     def get_model(self):
         return self.model
 
     def get_processor(self):
         return self.processor
+
+    def get_rad_classifier(self):
+        return self.rad_classifier
 
     def download_model(self):
         # Ensure the local directory exists
@@ -49,15 +73,17 @@ class VQAModel:
             os.makedirs(self.model_path)
 
         # List all objects in the folder
-        paginator = s3.get_paginator('list_objects_v2')
+        paginator = s3.get_paginator("list_objects_v2")
         for page in paginator.paginate(Bucket=BUCKET_NAME, Prefix=FOLDER_KEY):
-            if 'Contents' in page:
-                for obj in page['Contents']:
+            if "Contents" in page:
+                for obj in page["Contents"]:
                     # Get the file key (S3 path of the file)
-                    file_key = obj['Key']
+                    file_key = obj["Key"]
 
                     # Construct the local path by removing the S3 folder prefix from the file key
-                    local_file_path = os.path.join(self.model_path, file_key[len(FOLDER_KEY):])
+                    local_file_path = os.path.join(
+                        self.model_path, file_key[len(FOLDER_KEY) :]
+                    )
 
                     # Download the file from S3
                     print(f"Downloading {file_key} to {local_file_path}...")
