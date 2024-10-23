@@ -1,70 +1,66 @@
-from transformers import RobertaTokenizer, TFRobertaModel
-from tensorflow.keras.applications import ResNet50
-import keras
 import os
 import boto3
 from dotenv import load_dotenv
+from transformers import BlipProcessor, BlipForQuestionAnswering
 
 # Load environment variables from the .env file
 load_dotenv()
 
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_DEFAULT_REGION = os.getenv('AWS_DEFAULT_REGION')
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 # Initialize a session using Amazon S3
 s3 = boto3.client(
-    's3',
+    "s3",
     aws_access_key_id=AWS_ACCESS_KEY_ID,
     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    region_name=AWS_DEFAULT_REGION
+    region_name=AWS_DEFAULT_REGION,
 )
 
-# Define the S3 bucket and file details
+# Define the S3 bucket and folder details
 BUCKET_NAME = "roberta-finetuned"
-FILE_KEY = "vqa_model_roberta_finetuned.keras"
+FOLDER_KEY = "blip_finetuned_model/"  # S3 folder path
 
 
 # Define the VQAModel class with Keras model
 class VQAModel:
     def __init__(self):
-        # Set the path for the model file inside the models directory
-        model_path = os.path.join(
-            os.path.dirname(__file__), "vqa_model_roberta_finetuned.keras"
-        )
+        # Set the path for the model folder inside the models directory
+        self.model_path = os.path.join(os.path.dirname(__file__), "blip_finetuned_model")
 
-        # Check if the model file already exists
-        if not os.path.exists(model_path):
-            self.download_model(model_path)
+        # Check if the model folder already exists
+        if not os.path.exists(self.model_path):
+            self.download_model()
 
-        # Load the pre-trained Keras model
-        self.model = keras.models.load_model(model_path)
-
-        # Initialize ResNet50 model for image feature extraction
-        self.resnet_model = ResNet50(
-            weights="imagenet", include_top=False, input_shape=(224, 224, 3)
-        )
-
-        # Load the pre-trained Roberta Tokenizer and model
-        self.tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-        self.roberta_model = TFRobertaModel.from_pretrained("roberta-large")
+        # Load the pre-trained model and processor
+        self.model = BlipForQuestionAnswering.from_pretrained(self.model_path)
+        self.processor = BlipProcessor.from_pretrained(self.model_path)
 
     def get_model(self):
         return self.model
 
-    def get_resnet(self):
-        return self.resnet_model
+    def get_processor(self):
+        return self.processor
 
-    def get_tokenizer(self):
-        return self.tokenizer
+    def download_model(self):
+        # Ensure the local directory exists
+        if not os.path.exists(self.model_path):
+            os.makedirs(self.model_path)
 
-    def get_roberta_model(self):
-        return self.roberta_model
+        # List all objects in the folder
+        paginator = s3.get_paginator('list_objects_v2')
+        for page in paginator.paginate(Bucket=BUCKET_NAME, Prefix=FOLDER_KEY):
+            if 'Contents' in page:
+                for obj in page['Contents']:
+                    # Get the file key (S3 path of the file)
+                    file_key = obj['Key']
 
-    def download_model(self, model_path):
-        # Download the model from S3
-        print(f"Downloading model from s3 to {model_path}...")
+                    # Construct the local path by removing the S3 folder prefix from the file key
+                    local_file_path = os.path.join(self.model_path, file_key[len(FOLDER_KEY):])
 
-        # Download the file from S3
-        s3.download_file(BUCKET_NAME, FILE_KEY, model_path)
-        print("Model downloaded successfully.")
+                    # Download the file from S3
+                    print(f"Downloading {file_key} to {local_file_path}...")
+                    s3.download_file(BUCKET_NAME, file_key, local_file_path)
+
+        print("Model folder downloaded successfully.")
