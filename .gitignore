@@ -174,3 +174,4 @@ cython_debug/
 *.keras
 package-lock.json
 blip_finetuned_model/
+*.pth
