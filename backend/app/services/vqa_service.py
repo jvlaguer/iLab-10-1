@@ -47,7 +47,7 @@ def is_radiology_image(image):
 
 
 # Function to predict the answer
-def predict_vqa(question, image):
+def predict_vqa(question, image=None):
     # Process the question with BLIP for a descriptive answer
     if is_radiology_image(image):
         image = Image.open(image)
